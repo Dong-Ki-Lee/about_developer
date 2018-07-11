@@ -44,7 +44,8 @@ GC는 일반적인 프로그램일 경우 대부분 가지고 있는 아래의 �
 
 영역별 데이터 흐름을 간략하게 표시하면 다음과 같다.
 
-![GC_Process](./image/GC_Process.jpg)Data 가 Young Generation 영역에 할당되고, 여기서 GC가 여러번 일어나도 남아있는 객체들은 Old Generation 영역으로 옮겨가게 된다.
+![GC_Process](./image/GC_Process.jpg)
+Data 가 Young Generation 영역에 할당되고, 여기서 GC가 여러번 일어나도 남아있는 객체들은 Old Generation 영역으로 옮겨가게 된다.
 
 Permanent Generation은 이름에서 마치 Old Generation에서 남게 된 객체가 영원히 남는 장소라는 느낌을 주지만, 그런 영역이 아니다. 이는 클래스나 메소드 등의 metadata를 저장하거나 string pool의 공간으로 사용되는 공간이다.
 
