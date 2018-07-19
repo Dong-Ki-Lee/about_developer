@@ -117,5 +117,79 @@ pivot 보다 작은 수, pivot보다 큰 수를 모으고, 그 가운데에 pivo
 
 ## heap sort
 
+#### heap
+
 heap sort를 알기 위해서는 먼저 heap 이라는게 뭔지 알아야한다.
+
+heap은 최댓값 또는 최솟값을 빠르게 찾기 위해 고안된 완전이진트리를 기반으로 만들어진 자료구조이다.
+
+heap은 완전 이진트리의 구조를 가지면서 다음의 property를 가지는데,
+
+* 부모노드와 자식노드 사이에 대소관계가 존재
+
+부모노드쪽이 작다면 최소힙, 부모노드쪽이 크다면 최대힙이 된다.
+
+heap 구조에서 가장 조심해야 할 것은, 형제노드들은 대소관계가 없다는 것이다.
+
+#### heap sort
+
+heap sort는 다음 순서대로 동작하는 알고리즘이다.
+
+1. 입력받은 list를 heap형태에 맞게 바꾼다.
+2. root node를 추출한다.
+3. leaf node 하나를 root node로 올리고 heap 형태에 다시 맞춘다(heapify)
+4. 과정 2 부터 반복하여 heap에 모든 정보가 사라질때까지 반복한다.
+
+heap 에서 데이터를 뽑을 때에는 cost가 들지 않고, 뽑은 뒤에 다시 heap 형태로 맞추기 위한 heapify 과정에서 log n 의 cost가 소모된다.
+
+총 자료수 n 에대해서, log n 의 과정이 n 번 반복되는 것으로, O(n * log n)의 시간복잡도를 가진다.
+
+```python
+def heapify(list_to_heapify):
+    list_to_heapify[0] = list_to_heapify[-1]
+    list_to_heapify = list_to_heapify[:-1]
+    point = 0
+    while (point * 2) < len(list_to_heapify) - 1:
+        if point * 2 + 1 == len(list_to_heapify) - 1:
+            if list_to_heapify[point * 2 + 1] > list_to_heapify[point]:
+                temp = list_to_heapify[point]
+                list_to_heapify[point] = list_to_heapify[point * 2 + 1]
+                list_to_heapify[point * 2 + 1] = temp
+            break
+        
+        if list_to_heapify[point*2 + 1] >= list_to_heapify[point*2 + 2]:
+            if list_to_heapify[point * 2 + 1] > list_to_heapify[point]:
+                temp = list_to_heapify[point]
+                list_to_heapify[point] = list_to_heapify[point * 2 + 1]
+                list_to_heapify[point * 2 + 1] = temp
+                point = point * 2 + 1
+            else:
+                break
+        
+        else:
+            if list_to_heapify[point * 2 + 2] > list_to_heapify[point]:
+                temp = list_to_heapify[point]
+                list_to_heapify[point] = list_to_heapify[point * 2 + 2]
+                list_to_heapify[point * 2 + 2] = temp
+                point = point * 2 + 2
+            else:
+                break
+    return list_to_heapify
+
+
+def make_heap(list_to_heap):
+    for i in range(len(list_to_heap)-1, 0, -1):
+        if list_to_heap[int((i - 1) / 2)] < list_to_heap[i]:
+            temp = list_to_heap[int((i - 1) / 2)]
+            list_to_heap[int((i - 1) / 2)] = list_to_heap[i]
+            list_to_heap[i] = temp
+    return list_to_heap
+
+
+sort_list = [1,7,3,6,2,9,8]
+sort_list = make_heap(sort_list)
+while len(sort_list) > 0:
+    print(sort_list[0])
+    sort_list = heapify(sort_list)
+```
 
