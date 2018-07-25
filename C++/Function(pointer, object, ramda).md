@@ -116,16 +116,42 @@ class Plus {
 };
 
 int main() {
-    Plus plus;
+    Plus p;
     
-    cout << plus(10, 20) << endl;
+    cout << p(10, 20) << endl;
     return 0;
 }
 ```
 
-Plus Class 에서 함수 호출 연산자를 overloading 하여 메인함수 내에서는 객체 plus를 함수 호출하듯 매개변수를 넘기고 사용한다.
+Plus Class 에서 함수 호출 연산자를 overloading 하여 메인함수 내에서는 객체 p를 함수 호출하듯 매개변수를 넘기고 사용한다.
 
-plus(10, 20) 코드는 plus.operator()(10,20) 에서 .operator()가 생략된 형태이다. 
+p(10, 20) 코드는 plus.operator()(10,20) 에서 .operator()가 생략된 형태이다. 
+
+Class 말고도 struct를 이용해 만들 수 있다. struct는 모든게 public인 class로 간주할 수 있다. 그렇기 때문에 내부에 함수 호출 연산자만 overload 해서 정의해주면 만들 수 있다. 코드는 다음과 같다.
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+struct Accumulator {
+    int result;
+    Accumulator () {
+        result = 0
+    }
+    int operator() (int i) {
+        return result += i;
+    }
+};
+
+int main() {
+    Accumulator a;
+    cout << a(10) << endl;
+    cout << a(20) << endl;
+}
+```
+
+위 코드의 결과로는 10, 30이 출력된다.
 
 이렇게 구현할 경우에 명시적, 암묵적 호출이 존재한다. 코드로 이를 설명하자면,
 
@@ -135,7 +161,7 @@ Plus plus;
 plus.operator()(10,20);
 //암묵적 호출
 plus(5, 5);
-//Plus 임시 객체 생성 뒤 암묵적 호출출출출
+//Plus 임시 객체 생성 뒤 암묵적 호출
 Plus()(10, 10);
 ```
 
@@ -149,5 +175,89 @@ Plus()(10, 10);
 
 ## 람다
 
+#### 함수객체와 람다의 비교
 
+위 함수객체를 이용해서 stl algorithm 을 사용하는 예시를 보고, 람다에 대해 설명한 뒤 비교하고자 한다.
+
+먼저 함수객체를 이용한 stl algorithm 사용 예시 코드는 다음과 같다.
+
+```c++
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+template <typename T>
+struct Accumulator {
+    T & acc;
+    Accumulator(T & _acc) : acc(_acc) {}
+    template <typename V>
+    void operator()(V & v) {
+        acc += v;
+    }
+};
+
+int main() {
+    vector<int> ints;
+    ints.push_back(2);
+    ints.push_back(5);
+    ints.push_back(7);
+    ints.push_back(4);
+    int acc_value = 0;
+    for_each(ints.begin(), ints.end(), Accumulator<int>(acc_value));
+    cout << acc_value << endl;
+}
+```
+
+위  코드를 보면, for_each 의 algorithm을 이용하기 위한 함수 객체의 코드가 매우 길어지는것을 확인할 수 있다.
+
+여기서 람다를 이용한다면, 코드가 짧고 간결해진다.
+
+람다의 기본 형태는 다음과 같다.
+
+```c++
+[외부 변수 모드] (parameter) -> return_type {statement}
+
+//예시
+int outer = 3;
+[=outer] (int input) -> int { return input % outer }
+```
+
+위 예제에서 람다의 기본형태를 알게되었다. 이를 이용해 함수 객체를 이용한 위의 코드를 람다를 이용한 코드로 바꿔보면 다음과 같이 간결하게 마무리 된다.
+
+```c++
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    vector<int> ints;
+    ints.push_back(2);
+    ints.push_back(5);
+    ints.push_back(7);
+    ints.push_back(4);
+    int acc_value = 0;
+    for_each(ints.begin(), ints.end(), [&acc_value](int i){acc_value += i;} );
+    cout << acc_value << endl;
+}
+```
+
+람다를 이용하면 함수 객체를 이용하지 않고도 위와 같은 짧고 간결한 코드로 stl을 사용할 수 있다. 
+
+#### 람다의 외부 객체 이용
+
+람다에서 외부 객체를 쓰기 위해서는 람다의 처음부분인 [외부 변수 모드]에서 여러 설정을 통해서 사용할 수 있다.
+
+설정의 종류는 다음과 같다.
+
+1. [&] () {...} 모든 변수를 reference로 불러온다. 즉 외부 변수 자체를 넣어서 사용하는 것 처럼 쓸 수 있다.
+2. [=] () {...} 모든 변수를 value로 불러온다. 즉 외부 변수의 값만 가져와서 사용하기에 외부 객체의 값이 변하지 않는다.
+3. [=, &x, &y] () {...} 모든 변수를 value로 불러오고 x와 y만 reference 로 불러온다.
+4. [&, x, y] () {...} 모든 변수를 reference로 불러오고 x와 y만 value 로 불러온다.
+5. [x, &y, &z] () {...} 지정한 변수들을 각자의 설정으로 불러온다.
+
+이렇게 부러오는 객체들은 해당 위치에서 접근 가능한 객체들이어야 불러올 수 있다.
 
