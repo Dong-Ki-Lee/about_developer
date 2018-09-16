@@ -91,3 +91,64 @@ public class Connect {
 
 ## Static 메소드
 
+보통 유틸리티성 메소드를 작성할 때 많이 사용되는 메소드로, 앞에 static을 붙여서 메소드를 정의하게 되면 클래스를 통해 호출할 수 있게 된다
+
+> 클래스명.메소드명()
+
+따로 클래스를 선언하지 않고도 사용할 수 있는 성질 때문에, 스태틱 메소드 안에서는 일반적인 인스턴스 변수는 접근이 불가능하고, static 변수만 접근이 가능하다.
+
+
+
+## Static 을 이용한 Singleton Pattern
+
+Singleton Pattern은 단 하나의 객체만을 생성하도록 강제하는 패턴이다.
+
+먼저 해야 할 일은 생성자를 private로 만드는 것이다.
+
+단 하나의 객체를 생성하기 위해서는 아무곳에서나 생성자를 통해서 생성이 가능하면 안되기 때문이다.
+
+```java
+class Singleton {
+    private Singleton() {
+        
+    }
+}
+```
+
+하지만 위와 같이 하면 생성 자체가 불가능하기 때문에, 생성자는 직접 사용하지 못하지만, 생성자를 호출할 수 있는 static함수를 만들면 다음과 같은 모습이 된다.
+
+```java
+class Singleton {
+    private Singleton() {
+        
+    }
+    
+    public static Singleton getInstance() {
+        return new Singleton();
+    }
+}
+```
+
+매번 Singleton의 getInstance() 메소드를 실행하면 생성자를 호출해 반환하게 된다.
+
+그렇지만 이는 호출할 때 마다 새로운 객체를 생성하여 반환하기 때문에 singleton이 아니게 된다.
+
+최종 모습을 보면 다음과 같게 된다.
+
+```java
+class Singleton {
+    private static Singleton only;
+    private Singleton() {
+        
+    }
+    public static Singleton getInstance() {
+        if ( only == null ) {
+            only = new Singleton();
+        }
+        return only;
+    }
+}
+```
+
+이런식으로 코드를 구성하면 singleton pattern에 맞춰 하나의 객체만 생성되는 코드가 된다.
+
